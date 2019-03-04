@@ -83,7 +83,7 @@ int MinCycle::FindMin() {
         minCycles[v] = bfs(v); // for each bfs: count a sum of depths for a vertex of the first found cycle
     } // (this algorithm guarantees us that we will launch with a vertex in min cycle and so the answer is a sum of two depths of another vertex in this cycle)
     int minReturn = graph.VerticesCount() + 1;
-    for (int i = 0; i < graph.VerticesCount(); ++i) { // выбор минимальной длины цикла
+    for (int i = 0; i < graph.VerticesCount(); ++i) { // choosing min from cycles' lengths
         if (minCycles[i] < minReturn) {
             minReturn = minCycles[i];
         }
