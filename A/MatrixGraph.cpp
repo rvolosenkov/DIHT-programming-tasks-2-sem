@@ -1,10 +1,8 @@
 #include "MatrixGraph.h"
-#include<iostream>
 
 MatrixGraph::MatrixGraph(const IGraph* Graph) : verticesNumber(Graph -> VerticesCount()), vertices(Graph -> VerticesCount(), std::vector<bool>(Graph -> VerticesCount(), false)) {
     for (int v = 0; v < verticesNumber; ++v) {
         std::vector<int> currVertices;
-
         Graph -> GetNextVertices(v, currVertices);
         for (int i = 0; i < currVertices.size(); ++i) {
             AddEdge(v, currVertices[i]);
