@@ -40,7 +40,7 @@ int FindSequenceOfMoves::countDisorders() {
     }
     return result;
 }
-//¿¿¿¿¿
+//√Ä√Ä√Ä√Ä√Ä
 void FindSequenceOfMoves::getNeighbors(std::vector<int>& currState, std::vector<std::vector<int>>& neighbors) {
     int pos = this -> findPos(currState);
     if (pos > 2) {
