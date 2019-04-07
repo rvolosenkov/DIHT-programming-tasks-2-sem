@@ -44,9 +44,6 @@ void DirectedGraph::GetPrevVertices(int vertex, std::vector<std::pair<double, in
 class Bellman {
 public:
     Bellman(DirectedGraph* Graph) : graph(Graph), longestWays(Graph -> VerticesCount(), -1.0) {}
-    ~Bellman() {
-        longestWays.clear();
-    }
     bool FindGoodCycle();
 
 private:
@@ -73,6 +70,7 @@ bool Bellman::FindGoodCycle() {
             graph -> GetPrevVertices(u, prevGeneration);
             for (auto v : prevGeneration) {
                 if (longestWays[u] != -1.0 && longestWays[v.second] < longestWays[u] * v.first) {
+                    longestWays.clear();
                     return true;
                 }
             }
@@ -81,6 +79,7 @@ bool Bellman::FindGoodCycle() {
             longestWays[i] = -1.0;
         }
     }
+    longestWays.clear();
     return false;
 }
 
@@ -101,10 +100,6 @@ int main() {
     }
     Bellman SearchBenefit(&Graph);
     bool answer = SearchBenefit.FindGoodCycle();
-    if (answer == true) {
-        std::cout << "YES";
-    } else {
-        std::cout << "NO";
-    }
+    std::cout << (answer == true ? "YES" : "NO");
     return 0;
 }
