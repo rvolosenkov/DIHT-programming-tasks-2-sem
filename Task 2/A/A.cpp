@@ -79,12 +79,12 @@ double Dijkstra::Find(int from, int to) {
                     }
                     minWays[nextGeneration[i].second] = minWays[currVertex.second] + nextGeneration[i].first;
                     nearestVertices.insert(std::make_pair(minWays[nextGeneration[i].second], nextGeneration[i].second)); // take next vertex from set or decrease key for old vertices
-                    std::cout << nearestVertices.begin() -> first << std::endl;
                 }
             }
         }
     }
     double answer = (minWays[to] < inf ? minWays[to] : -1.0);
+    nearestVertices.clear();
     minWays.clear();
     visited.clear();
     return answer;
