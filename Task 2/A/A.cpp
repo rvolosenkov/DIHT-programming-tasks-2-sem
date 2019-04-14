@@ -6,35 +6,40 @@
 
 const int inf = 1e9; // inf > max(n) * max(lenOfWay)
 
+template<typename T>
 class UndirectedGraph {
 public:
     UndirectedGraph(int verticesNumber_) : verticesNumber(verticesNumber_), vertices(verticesNumber_) {}
-    void AddEdge(int from, int to, double weight);
+    void AddEdge(int from, int to, T weight);
     int VerticesCount() const;
-    void GetNextVertices(int vertex, std::vector<std::pair<double, int>>& nextVertices) const;
-    void GetPrevVertices(int vertex, std::vector<std::pair<double, int>>& prevVertices) const;
+    void GetNextVertices(int vertex, std::vector<std::pair<T, int>>& nextVertices) const;
+    void GetPrevVertices(int vertex, std::vector<std::pair<T, int>>& prevVertices) const;
 
 private:
     int verticesNumber;
-    std::vector<std::list<std::pair<double, int>>> vertices;
+    std::vector<std::list<std::pair<T, int>>> vertices;
 };
 
-void UndirectedGraph::AddEdge(int from, int to, double weight) {
+template<typename T>
+void UndirectedGraph<T>::AddEdge(int from, int to, T weight) {
     vertices[from].push_back(std::make_pair(weight, to));
     vertices[to].push_back(std::make_pair(weight, from));
 }
 
-int UndirectedGraph::VerticesCount() const {
+template<typename T>
+int UndirectedGraph<T>::VerticesCount() const {
     return verticesNumber;
 }
 
-void UndirectedGraph::GetNextVertices(int vertex, std::vector<std::pair<double, int>>& nextVertices) const {
+template<typename T>
+void UndirectedGraph<T>::GetNextVertices(int vertex, std::vector<std::pair<T, int>>& nextVertices) const {
     for (auto v : vertices[vertex]) {
         nextVertices.push_back(v);
     }
 }
 
-void UndirectedGraph::GetPrevVertices(int vertex, std::vector<std::pair<double, int>>& prevVertices) const {
+template<typename T>
+void UndirectedGraph<T>::GetPrevVertices(int vertex, std::vector<std::pair<T, int>>& prevVertices) const {
     for (int v = 0; v < verticesNumber; ++v) {
         for (auto w : vertices[v]) {
             if (w.second == vertex) {
@@ -44,21 +49,23 @@ void UndirectedGraph::GetPrevVertices(int vertex, std::vector<std::pair<double, 
     }
 }
 
+template<typename T>
 class Dijkstra {
 public:
-    Dijkstra(UndirectedGraph* Graph) : graph(Graph) {}
-    double Find(int from, int to);
+    Dijkstra(UndirectedGraph<T>* Graph) : graph(Graph) {}
+    T Find(int from, int to);
 
 private:
-    UndirectedGraph* graph;
+    UndirectedGraph<T>* graph;
     int from;
     int to;
-    std::set<std::pair<double, int>> nearestVertices; // we use set (priority queue) to check all the vertices
-    std::vector<double> minWays;
+    std::set<std::pair<T, int>> nearestVertices; // we use set (priority queue) to check all the vertices
+    std::vector<T> minWays;
     std::vector<bool> visited;
 };
 
-double Dijkstra::Find(int from, int to) {
+template <typename T>
+T Dijkstra<T>::Find(int from, int to) {
     for (int i = 0; i < graph -> VerticesCount(); ++i) {
         minWays.push_back(inf);
         visited.push_back(false);
@@ -66,16 +73,16 @@ double Dijkstra::Find(int from, int to) {
     minWays[from] = 0;
     nearestVertices.insert(std::make_pair(0, from));
     while (nearestVertices.empty() == false) {
-        std::pair<double, int> currVertex = *nearestVertices.begin();
+        std::pair<T, int> currVertex = *nearestVertices.begin();
         nearestVertices.erase(nearestVertices.begin());
         visited[currVertex.second] = true;
-        std::vector<std::pair<double, int>> nextGeneration;
+        std::vector<std::pair<T, int>> nextGeneration;
         graph -> GetNextVertices(currVertex.second, nextGeneration); // get all offspring of a current vertex
         for (int i = 0; i < nextGeneration.size(); ++i) {
             if (visited[nextGeneration[i].second] == false) {
                 if (minWays[nextGeneration[i].second] > minWays[currVertex.second] + nextGeneration[i].first) {
                     if (minWays[nextGeneration[i].second] != inf) {
-                        nearestVertices.erase(std::make_pair(nextGeneration[i].second, minWays[nextGeneration[i].second]));
+                        nearestVertices.erase(std::make_pair(minWays[nextGeneration[i].second], nextGeneration[i].second));
                     }
                     minWays[nextGeneration[i].second] = minWays[currVertex.second] + nextGeneration[i].first;
                     nearestVertices.insert(std::make_pair(minWays[nextGeneration[i].second], nextGeneration[i].second)); // take next vertex from set or decrease key for old vertices
@@ -83,7 +90,7 @@ double Dijkstra::Find(int from, int to) {
             }
         }
     }
-    double answer = (minWays[to] < inf ? minWays[to] : -1.0);
+    T answer = (minWays[to] < inf ? minWays[to] : -1.0);
     nearestVertices.clear();
     minWays.clear();
     visited.clear();
@@ -93,7 +100,7 @@ double Dijkstra::Find(int from, int to) {
 int main() {
     int n, m;
     std::cin >> n >> m;
-    UndirectedGraph Graph(n);
+    UndirectedGraph<double> Graph(n);
     for (int i = 0; i < m; ++i) {
         int from, to;
         double weight;
@@ -102,7 +109,7 @@ int main() {
     }
     int from, to;
     std::cin >> from >> to;
-    Dijkstra FindMinWay(&Graph);
+    Dijkstra<double> FindMinWay(&Graph);
     double answer = FindMinWay.Find(from, to);
     std::cout << answer;
     return 0;
