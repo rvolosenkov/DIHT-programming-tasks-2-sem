@@ -4,28 +4,32 @@
 
 const int inf = 1e9;
 
+template<typename T>
 class DirectedGraph {
 public:
-    DirectedGraph(int verticesNumber_) : verticesNumber(verticesNumber_), vertices(verticesNumber_, std::vector<double>(verticesNumber_, 0)) {}
-    void AddEdge(int from, int to, double weight);
+    DirectedGraph(int verticesNumber_) : verticesNumber(verticesNumber_), vertices(verticesNumber_, std::vector<T>(verticesNumber_, 0)) {}
+    void AddEdge(int from, int to, T weight);
     int VerticesCount() const;
-    void GetNextVertices(int vertex, std::vector<std::pair<double, int>>& nextVertices) const;
-    void GetPrevVertices(int vertex, std::vector<std::pair<double, int>>& prevVertices) const;
+    void GetNextVertices(int vertex, std::vector<std::pair<T, int>>& nextVertices) const;
+    void GetPrevVertices(int vertex, std::vector<std::pair<T, int>>& prevVertices) const;
 
 private:
     int verticesNumber;
-    std::vector<std::vector<double>> vertices;
+    std::vector<std::vector<T>> vertices;
 };
 
-void DirectedGraph::AddEdge(int from, int to, double weight) {
+template<typename T>
+void DirectedGraph<T>::AddEdge(int from, int to, T weight) {
     vertices[from][to] = weight;
 }
 
-int DirectedGraph::VerticesCount() const {
+template<typename T>
+int DirectedGraph<T>::VerticesCount() const {
     return verticesNumber;
 }
 
-void DirectedGraph::GetNextVertices(int vertex, std::vector<std::pair<double, int>>& nextVertices) const {
+template<typename T>
+void DirectedGraph<T>::GetNextVertices(int vertex, std::vector<std::pair<T, int>>& nextVertices) const {
     for (int i = 0; i < verticesNumber; ++i) {
         if (vertices[vertex][i] != 0) {
             nextVertices.push_back(std::make_pair(vertices[vertex][i], i));
@@ -33,26 +37,29 @@ void DirectedGraph::GetNextVertices(int vertex, std::vector<std::pair<double, in
     }
 }
 
-void DirectedGraph::GetPrevVertices(int vertex, std::vector<std::pair<double, int>>& prevVertices) const {
+template<typename T>
+void DirectedGraph<T>::GetPrevVertices(int vertex, std::vector<std::pair<T, int>>& prevVertices) const {
     for (int i = 0; i < verticesNumber; ++i) {
         if (vertices[i][vertex] != 0) {
-            prevVertices.push_back(std::make_pair(vertices[vertex][i], i));
+            prevVertices.push_back(std::make_pair(vertices[i][vertex], i));
         }
     }
 }
 
+template<typename T>
 class Floyd {
 public:
-    Floyd(DirectedGraph* Graph) : graph(Graph) {}
-    void FindMatrix(std::vector<std::vector<double>>& Matrix);
+    Floyd(DirectedGraph<T>* Graph) : graph(Graph) {}
+    void FindMatrix(std::vector<std::vector<T>>& Matrix);
 
 private:
-    DirectedGraph* graph;
+    DirectedGraph<T>* graph;
 };
 
-void Floyd::FindMatrix(std::vector<std::vector<double>>& Matrix) {
+template<typename T>
+void Floyd<T>::FindMatrix(std::vector<std::vector<T>>& Matrix) {
     for (int i = 0; i < graph -> VerticesCount(); ++i) { // initially we fill Matrix with ways which contains not more than 1 edge
-        std::vector<std::pair<double, int>> nextGeneration;
+        std::vector<std::pair<T, int>> nextGeneration;
         graph -> GetNextVertices(i, nextGeneration);
         for (int j = 0; j < nextGeneration.size(); ++j) {
             Matrix[i][nextGeneration[j].second] = nextGeneration[j].first;
@@ -70,7 +77,7 @@ void Floyd::FindMatrix(std::vector<std::vector<double>>& Matrix) {
 int main() {
     int n;
     std::cin >> n;
-    DirectedGraph Graph(n);
+    DirectedGraph<double> Graph(n);
     for (int from = 0; from < n; ++from) {
         for (int to = 0; to < n; ++to) {
             double weight;
@@ -78,7 +85,7 @@ int main() {
             Graph.AddEdge(from, to, weight);
         }
     }
-    Floyd SearchShortestWays(&Graph);
+    Floyd<double> SearchShortestWays(&Graph);
     std::vector<std::vector<double>> MatrixOfWays(n, std::vector<double>(n, 0));
     SearchShortestWays.FindMatrix(MatrixOfWays);
     for (int i = 0; i < n; ++i) {
